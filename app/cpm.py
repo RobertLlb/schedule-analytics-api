@@ -121,7 +121,10 @@ def compute_schedule(tasks: list[Task]) -> Schedule:
         )
         for tid in order
     ]
-    critical = sorted((t for t in scheduled if t.is_critical), key=lambda t: (t.early_start, t.early_finish))
+    critical = sorted(
+        (t for t in scheduled if t.is_critical),
+        key=lambda t: (t.early_start, t.early_finish),
+    )
     return Schedule(
         tasks=scheduled,
         project_duration=project_duration,

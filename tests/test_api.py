@@ -69,6 +69,35 @@ def test_cpm_from_csv_reports_bad_input():
     assert "line 2" in response.json()["detail"]
 
 
+def test_csv_over_the_size_limit_is_rejected_with_413():
+    too_big = "id,name,duration,predecessors\n" + "A," + "x" * 1_000_100 + ",1,\n"
+
+    response = client.post("/cpm/csv", content=too_big, headers={"content-type": "text/csv"})
+
+    assert response.status_code == 413
+
+
+def test_chunked_csv_over_the_limit_is_rejected_without_content_length():
+    def body():
+        yield b"id,name,duration,predecessors\n"
+        for _ in range(40):
+            yield b"A," + b"x" * 30_000 + b",1,\n"
+
+    response = client.post("/cpm/csv", content=body(), headers={"content-type": "text/csv"})
+
+    assert response.status_code == 413
+
+
+def test_csv_with_invalid_utf8_returns_422():
+    response = client.post(
+        "/cpm/csv",
+        content=b"id,name\n\xff\xfe",
+        headers={"content-type": "text/csv"},
+    )
+
+    assert response.status_code == 422
+
+
 def test_evm_endpoint():
     response = client.post("/evm", json={"bac": 1000, "pv": 500, "ev": 450, "ac": 600})
 

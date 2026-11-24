@@ -77,7 +77,7 @@ returns `spi: 0.9`, `cpi: 0.75`, `eac: 1333.33` and the other indicators.
 ## Tests
 
 ```bash
-pytest --cov=app --cov-report=term-missing   # 33 tests, 98% coverage
+pytest --cov=app --cov-report=term-missing   # 36 tests, 99% coverage
 ruff check .
 ```
 

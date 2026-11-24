@@ -119,9 +119,21 @@ def cpm(payload: ScheduleIn) -> ScheduleOut:
     },
 )
 async def cpm_csv(request: Request) -> ScheduleOut:
-    raw = await request.body()
-    if len(raw) > MAX_CSV_BYTES:
+    declared = request.headers.get("content-length")
+    if declared is not None and declared.isdigit() and int(declared) > MAX_CSV_BYTES:
         raise HTTPException(status_code=413, detail="CSV is too large")
+
+    # Read in chunks and stop as soon as the limit is passed, so a body without
+    # a Content-Length header (chunked upload) cannot fill memory.
+    chunks: list[bytes] = []
+    received = 0
+    async for chunk in request.stream():
+        received += len(chunk)
+        if received > MAX_CSV_BYTES:
+            raise HTTPException(status_code=413, detail="CSV is too large")
+        chunks.append(chunk)
+    raw = b"".join(chunks)
+
     try:
         tasks = parse_tasks_csv(raw.decode("utf-8-sig"))
     except UnicodeDecodeError as error:

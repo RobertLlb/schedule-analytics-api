@@ -49,7 +49,7 @@ def parse_tasks_csv(text: str) -> list[Task]:
             raise CsvImportError(f"line {line}: duration must be a whole number") from None
 
         raw_preds = (row["predecessors"] or "").strip()
-        predecessors = tuple(p.strip() for p in raw_preds.split(";") if p.strip()) if raw_preds else ()
+        predecessors = tuple(p.strip() for p in raw_preds.split(";") if p.strip())
         tasks.append(Task(task_id, (row["name"] or "").strip(), duration, predecessors))
 
     if not tasks:
