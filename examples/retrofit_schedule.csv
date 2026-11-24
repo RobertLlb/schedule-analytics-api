@@ -1,0 +1,10 @@
+id,name,duration,predecessors
+A,Basic design,10,
+B,Detailed design,20,A
+C,Order long-lead materials,5,B
+D,Material delivery,40,C
+E,Fabrication,30,B;D
+F,Site preparation,15,B
+G,Installation,25,E;F
+H,Commissioning,10,G
+I,Handover,0,H
